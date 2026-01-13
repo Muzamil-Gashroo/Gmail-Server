@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-card h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .login-card p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .google-btn {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .google-btn:hover {
+            border-color: #4285f4;
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Email Screen */
+        .email-screen {
+            display: none;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid #667eea;
+        }
+
+        .user-details h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .user-details p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #f1f3f4;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e8eaed;
+        }
+
+        .email-input {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 250px;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .stats {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .stat-text h3 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .stat-text p {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .emails-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .email-item {
+            padding: 20px;
+            border-bottom: 1px solid #f1f3f4;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .email-item:hover {
+            background: #f8f9fa;
+        }
+
+        .email-item:last-child {
+            border-bottom: none;
+        }
+
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+
+        .email-from {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .email-date {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .email-subject {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        .email-snippet {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .labels {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .label {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .label-inbox {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .label-unread {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .label-important {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 800px;
+            margin: 40px auto;
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f1f3f4;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .modal-close:hover {
+            background: #e8eaed;
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #f1f3f4;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .modal-subject {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .modal-meta {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .modal-body {
+            padding: 20px 0;
+            line-height: 1.8;
+            color: #333;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .modal-body h3 {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 15px 0 8px 0;
+        }
+
+        .modal-body p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .modal-body a {
+            color: #667eea;
+            text-decoration: underline;
+            word-break: break-all;
+        }
+
+        .modal-body li {
+            margin-left: 20px;
+            margin-bottom: 5px;
+        }
+
+        .email-body-html {
+            padding: 20px 0;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .email-body-html p {
+            margin-bottom: 10px;
+        }
+
+        .email-body-html a {
+            color: #667eea;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="login-screen">
+            <div class="login-card">
+                <h1>📬 Gmail Client</h1>
+                <p>Access your Gmail messages</p>
+                <button class="google-btn" onclick="loginWithGoogle()">
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Sign in with Google
+                </button>
+            </div>
+        </div>
+
+        <!-- Email Screen -->
+        <div id="emailScreen" class="email-screen">
+            <div class="header">
+                <div class="user-info">
+                    <img id="userAvatar" class="user-avatar" src="" alt="User">
+                    <div class="user-details">
+                        <h2 id="userName">Loading...</h2>
+                        <p id="userEmail">Loading...</p>
+                    </div>
+                </div>
+                <div class="controls">
+                    <input type="email" id="emailInput" class="email-input" placeholder="Enter email to fetch">
+                    <button class="btn btn-primary" onclick="fetchEmails()">📬 Inbox</button>
+                    <button class="btn btn-primary" onclick="fetchSentEmails()">📤 Sent</button>
+                    <button class="btn btn-primary" onclick="openComposeModal()">✉️ Compose</button>
+                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-icon">📧</div>
+                    <div class="stat-text">
+                        <h3 id="totalEmails">0</h3>
+                        <p>Total Emails</p>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">📬</div>
+                    <div class="stat-text">
+                        <h3 id="loadedEmails">0</h3>
+                        <p>Loaded</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="errorContainer"></div>
+
+            <div class="emails-container">
+                <div id="emailsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Detail Modal -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div class="modal-header">
+                <div class="modal-subject" id="modalSubject"></div>
+                <div class="modal-meta">
+                    <div><strong>From:</strong> <span id="modalFrom"></span></div>
+                    <div><strong>To:</strong> <span id="modalTo"></span></div>
+                    <div><strong>Date:</strong> <span id="modalDate"></span></div>
+                </div>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Compose Email Modal -->
+    <div id="composeModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeComposeModal()">×</button>
+            <div class="modal-header">
+                <div class="modal-subject">Compose New Email</div>
+            </div>
+            <div style="padding: 20px 0;">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">To:</label>
+                    <input type="email" id="composeTo" class="email-input" style="width: 100%;" placeholder="recipient@example.com" required>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Subject:</label>
+                    <input type="text" id="composeSubject" class="email-input" style="width: 100%;" placeholder="Email subject" required>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Message:</label>
+                    <textarea id="composeBody" style="width: 100%; min-height: 200px; padding: 10px 15px; border: 2px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 14px; resize: vertical;" placeholder="Type your message here..." required></textarea>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="trackRead" checked style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="font-size: 14px; color: #666;">Track when recipient opens this email</span>
+                    </label>
+                </div>
+                <div id="sendStatus" style="margin-bottom: 15px;"></div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="sendEmail()" id="sendBtn">
+                        <span id="sendBtnText">📤 Send Email</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeComposeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+        let currentUserEmail = '';
+
+        function loginWithGoogle() {
+            window.location.href = `${API_BASE}/auth/google`;
+        }
+
+        function logout() {
+            localStorage.removeItem('userEmail');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('emailScreen').style.display = 'none';
+        }
+
+        async function fetchEmails() {
+            const emailInput = document.getElementById('emailInput').value;
+            const email = emailInput || currentUserEmail;
+
+            if (!email) {
+                showError('Please enter an email address');
+                return;
+            }
+
+            currentUserEmail = email;
+            localStorage.setItem('userEmail', email);
+
+            const emailsList = document.getElementById('emailsList');
+            emailsList.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading emails...</p></div>';
+            document.getElementById('errorContainer').innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/emails/${email}?maxResults=20`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to fetch emails');
+                }
+
+                displayEmails(data);
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message);
+                emailsList.innerHTML = '';
+            }
+        }
+
+        function displayEmails(data) {
+            const emailsList = document.getElementById('emailsList');
+            document.getElementById('totalEmails').textContent = data.resultSizeEstimate || 0;
+            document.getElementById('loadedEmails').textContent = data.count || 0;
+
+            if (!data.emails || data.emails.length === 0) {
+                emailsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>No emails found</h3>
+                        <p>Try fetching emails for a different account</p>
+                    </div>
+                `;
+                return;
+            }
+
+            emailsList.innerHTML = data.emails.map(email => `
+                <div class="email-item" onclick='openEmail(${JSON.stringify(email)})'>
+                    <div class="email-header">
+                        <div class="email-from">${escapeHtml(email.from)}</div>
+                        <div class="email-date">${formatDate(email.date)}</div>
+                    </div>
+                    <div class="email-subject">${escapeHtml(email.subject)}</div>
+                    <div class="email-snippet">${escapeHtml(email.snippet)}</div>
+                    <div class="labels">
+                        ${email.labelIds ? email.labelIds.map(label => {
+                            const labelClass = label.toLowerCase().replace(/_/g, '-');
+                            return `<span class="label label-${labelClass}">${label}</span>`;
+                        }).join('') : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openEmail(email) {
+            document.getElementById('modalSubject').textContent = email.subject;
+            document.getElementById('modalFrom').textContent = email.from;
+            document.getElementById('modalTo').textContent = email.to;
+            document.getElementById('modalDate').textContent = formatDate(email.date);
+            
+            // Display body with better formatting
+            const bodyElement = document.getElementById('modalBody');
+            let bodyText = email.body || 'No content';
+            
+            // Split into paragraphs and format
+            const paragraphs = bodyText
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0);
+            
+            // Create formatted HTML
+            bodyElement.innerHTML = paragraphs
+                .map(p => {
+                    // Check if it's a link
+                    if (p.match(/^https?:\/\//)) {
+                        return `<p><a href="${p}" target="_blank" style="color: #667eea; word-break: break-all;">${p}</a></p>`;
+                    }
+                    // Check if it's a heading (short and ends with colon or all caps)
+                    else if (p.length < 50 && (p.endsWith(':') || p === p.toUpperCase())) {
+                        return `<h3 style="color: #333; font-size: 16px; font-weight: 600; margin: 15px 0 8px 0;">${escapeHtml(p)}</h3>`;
+                    }
+                    // Check if it starts with bullet point
+                    else if (p.match(/^[•\-\*]\s/)) {
+                        return `<li style="margin-left: 20px; margin-bottom: 5px;">${escapeHtml(p.substring(2))}</li>`;
+                    }
+                    // Regular paragraph
+                    else {
+                        return `<p style="margin-bottom: 10px; line-height: 1.6;">${escapeHtml(p)}</p>`;
+                    }
+                })
+                .join('');
+            
+            document.getElementById('emailModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('emailModal').style.display = 'none';
+        }
+
+        function openComposeModal() {
+            if (!currentUserEmail) {
+                showError('Please authenticate first');
+                return;
+            }
+            document.getElementById('composeModal').style.display = 'block';
+            document.getElementById('composeTo').value = '';
+            document.getElementById('composeSubject').value = '';
+            document.getElementById('composeBody').value = '';
+            document.getElementById('sendStatus').innerHTML = '';
+        }
+
+        function closeComposeModal() {
+            document.getElementById('composeModal').style.display = 'none';
+        }
+
+        async function sendEmail() {
+            const to = document.getElementById('composeTo').value.trim();
+            const subject = document.getElementById('composeSubject').value.trim();
+            const body = document.getElementById('composeBody').value.trim();
+            const trackRead = document.getElementById('trackRead').checked;
+            const sendBtn = document.getElementById('sendBtn');
+            const sendStatus = document.getElementById('sendStatus');
+
+            if (!to || !subject || !body) {
+                sendStatus.innerHTML = '<div class="error">Please fill in all fields</div>';
+                return;
+            }
+
+            if (!currentUserEmail) {
+                sendStatus.innerHTML = '<div class="error">Please authenticate first</div>';
+                return;
+            }
+
+            sendBtn.disabled = true;
+            document.getElementById('sendBtnText').textContent = '⏳ Sending...';
+            sendStatus.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/emails/${currentUserEmail}/send`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ to, subject, body, trackRead })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to send email');
+                }
+
+                sendStatus.innerHTML = `
+                    <div style="background: #e8f5e9; color: #2e7d32; padding: 15px; border-radius: 8px;">
+                        ✅ Email sent successfully!
+                        ${trackRead ? '<br>📊 Read tracking enabled' : ''}
+                    </div>
+                `;
+
+                setTimeout(() => {
+                    closeComposeModal();
+                }, 2000);
+
+            } catch (error) {
+                console.error('Error:', error);
+                sendStatus.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            } finally {
+                sendBtn.disabled = false;
+                document.getElementById('sendBtnText').textContent = '📤 Send Email';
+            }
+        }
+
+        async function fetchSentEmails() {
+            if (!currentUserEmail) {
+                showError('Please authenticate first');
+                return;
+            }
+
+            const emailsList = document.getElementById('emailsList');
+            emailsList.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading sent emails...</p></div>';
+            document.getElementById('errorContainer').innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/emails/${currentUserEmail}/sent`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to fetch sent emails');
+                }
+
+                displaySentEmails(data);
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message);
+                emailsList.innerHTML = '';
+            }
+        }
+
+        function displaySentEmails(data) {
+            const emailsList = document.getElementById('emailsList');
+            document.getElementById('totalEmails').textContent = data.emails.length;
+            document.getElementById('loadedEmails').textContent = data.emails.length;
+
+            if (!data.emails || data.emails.length === 0) {
+                emailsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>No sent emails with tracking</h3>
+                        <p>Send an email with tracking enabled to see it here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            emailsList.innerHTML = data.emails.map(email => `
+                <div class="email-item">
+                    <div class="email-header">
+                        <div class="email-from">To: ${escapeHtml(email.to)}</div>
+                        <div class="email-date">${formatDate(email.sentAt)}</div>
+                    </div>
+                    <div class="email-subject">${escapeHtml(email.subject)}</div>
+                    <div class="labels" style="margin-top: 10px; display: flex; gap: 10px; align-items: center;">
+                        ${email.opened 
+                            ? `<span class="label" style="background: #e8f5e9; color: #2e7d32;">
+                                ✓ Read ${email.openCount} time${email.openCount > 1 ? 's' : ''}
+                                ${email.openedAt ? ' - ' + formatDate(email.openedAt) : ''}
+                               </span>` 
+                            : `<span class="label" style="background: #fff3e0; color: #f57c00;">
+                                ⏳ Unread
+                               </span>`
+                        }
+                        ${!email.opened ? `<button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick='testTracking("${email.trackingId}")'>🧪 Test Track</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function testTracking(trackingId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/track/manual/${trackingId}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('✅ Email marked as opened! Refresh sent emails to see the update.');
+                    fetchSentEmails();
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('errorContainer').innerHTML = `
+                <div class="error">⚠️ ${escapeHtml(message)}</div>
+            `;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'Unknown date';
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return dateStr;
+            
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            if (days === 0) return 'Today';
+            if (days === 1) return 'Yesterday';
+            if (days < 7) return `${days} days ago`;
+            
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Check if user is logged in
+        window.addEventListener('load', () => {
+            const savedEmail = localStorage.getItem('userEmail');
+            
+            // Check if redirected from auth callback
+            const urlParams = new URLSearchParams(window.location.search);
+            const authSuccess = urlParams.get('auth');
+            
+            if (savedEmail || authSuccess === 'success') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('emailScreen').style.display = 'block';
+                
+                if (savedEmail) {
+                    currentUserEmail = savedEmail;
+                    document.getElementById('emailInput').value = savedEmail;
+                    document.getElementById('userEmail').textContent = savedEmail;
+                    document.getElementById('userName').textContent = savedEmail.split('@')[0];
+                    document.getElementById('userAvatar').src = `https://ui-avatars.com/api/?name=${savedEmail}&background=667eea&color=fff`;
+                    fetchEmails();
+                }
+            }
+
+            // Close modal when clicking outside
+            document.getElementById('emailModal').addEventListener('click', (e) => {
+                if (e.target.id === 'emailModal') {
+                    closeModal();
+                }
+            });
+
+            document.getElementById('composeModal').addEventListener('click', (e) => {
+                if (e.target.id === 'composeModal') {
+                    closeComposeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
